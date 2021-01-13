@@ -1,3 +1,6 @@
+extern crate rust_boilerplate as bp;
+
+
 fn main() {
-    println!("Hello, world!");
+    bp::hello();
 }
