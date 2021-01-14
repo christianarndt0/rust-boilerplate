@@ -1,6 +1,9 @@
-extern crate rust_boilerplate as bp;
+use rust_boilerplate::{
+    config::Config,
+};
 
 
 fn main() {
-    bp::hello();
+    let conf = Config::default();
+    conf.print();
 }
