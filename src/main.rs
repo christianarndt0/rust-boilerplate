@@ -6,10 +6,11 @@ use rust_boilerplate::{
 use log::{debug, info, warn};
 
 
-fn main() -> std::io::Result<()> {
+fn main() -> std::result::Result<(), std::io::Error> {
     let conf = Config::default();
     conf.print();
 
+    // must have ./log/ dir for debug build
     init_logger()?;
 
     debug!("debug message");

@@ -4,6 +4,24 @@ pub fn init_logger() -> std::result::Result<(), std::io::Error> {
     use std::fs::File;
     use std::time::{SystemTime, UNIX_EPOCH};
 
+    // determine logger level
+    #[cfg(debug_assertions)]
+    let level = LevelFilter::Debug;
+
+    #[cfg(not(debug_assertions))]
+    let level = LevelFilter::Info;
+
+    
+    fn init_combined_logger(level: LevelFilter, file: File) {
+        // initialize simplelog terminal and file logger
+        CombinedLogger::init(
+            vec![
+                TermLogger::new(level, Config::default(), TerminalMode::Mixed),
+                WriteLogger::new(level, Config::default(), file),
+            ]
+        ).unwrap();
+    }
+
     // get timestamp
     let stamp: String = match SystemTime::now().duration_since(UNIX_EPOCH){
         Ok(n) => n.as_secs().to_string(),
@@ -21,22 +39,12 @@ pub fn init_logger() -> std::result::Result<(), std::io::Error> {
 
     println!("Trying to create log file at: {}", log_dir.display());
 
-    // initialize simplelog terminal and file logger
-    #[cfg(debug_assertions)]
-    CombinedLogger::init(
-        vec![
-            TermLogger::new(LevelFilter::Info, Config::default(), TerminalMode::Mixed),
-            WriteLogger::new(LevelFilter::Debug, Config::default(), File::create(log_dir).unwrap()),
-        ]
-    ).unwrap();
-
-    #[cfg(not(debug_assertions))]
-    CombinedLogger::init(
-        vec![
-            TermLogger::new(LevelFilter::Warn, Config::default(), TerminalMode::Mixed),
-            WriteLogger::new(LevelFilter::Info, Config::default(), File::create(log_dir).unwrap()),
-        ]
-    ).unwrap();
+    // try to create new log file in `./log/`
+    // fails if directory doesnt exist and returns error
+    match File::create(log_dir){
+        Ok(f) => init_combined_logger(level, f),
+        Err(_) => TermLogger::init(level, Config::default(), TerminalMode::Mixed).unwrap(),
+    };
 
     Ok(())
 }
