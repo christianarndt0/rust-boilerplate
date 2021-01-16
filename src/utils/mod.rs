@@ -1,50 +1,25 @@
-pub fn init_logger() -> std::result::Result<(), std::io::Error> {
-    // import stuff 
-    use simplelog::*;
-    use std::fs::File;
-    use std::time::{SystemTime, UNIX_EPOCH};
+//! Basic utilities module
+//! 
+//! This module contains a sample function and test (add) that serve as a template and should be replaced.
+//! 
+//! The imported logging submodule is fully functional and can be used as is in any project.
 
-    // determine logger level
-    #[cfg(debug_assertions)]
-    let level = LevelFilter::Debug;
+pub mod logging;
 
-    #[cfg(not(debug_assertions))]
-    let level = LevelFilter::Info;
 
-    
-    fn init_combined_logger(level: LevelFilter, file: File) {
-        // initialize simplelog terminal and file logger
-        CombinedLogger::init(
-            vec![
-                TermLogger::new(level, Config::default(), TerminalMode::Mixed),
-                WriteLogger::new(level, Config::default(), file),
-            ]
-        ).unwrap();
+pub fn add(a: i32, b: i32) -> i32 {
+    a + b
+}
+
+
+#[cfg(test)]
+mod tests {
+    // import everything from the parent (utils) module
+    use super::*;
+
+    // define test
+    #[test]
+    fn test_add() {
+        assert_eq!(4, add(2, 2));
     }
-
-    // get timestamp
-    let stamp: String = match SystemTime::now().duration_since(UNIX_EPOCH){
-        Ok(n) => n.as_secs().to_string(),
-        Err(_) => String::from("0"),
-    };
-
-    // generate file name
-    let mut log_name = String::from("log");
-    log_name.push_str(&stamp);
-    log_name.push_str(".txt");
-
-    // generate absolute path
-    let mut log_dir = std::env::current_dir()?;
-    log_dir = log_dir.join("log").join(log_name);
-
-    println!("Trying to create log file at: {}", log_dir.display());
-
-    // try to create new log file in `./log/`
-    // fails if directory doesnt exist and returns error
-    match File::create(log_dir){
-        Ok(f) => init_combined_logger(level, f),
-        Err(_) => TermLogger::init(level, Config::default(), TerminalMode::Mixed).unwrap(),
-    };
-
-    Ok(())
 }
