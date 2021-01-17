@@ -5,10 +5,10 @@ use rust_boilerplate::{
 
 
 fn main() -> Result<(), std::io::Error> {
+    init_logger()?;
+
     let conf = Config::default();
     conf.print();
-
-    init_logger()?;
 
     Ok(())
 }
