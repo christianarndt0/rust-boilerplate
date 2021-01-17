@@ -1,17 +1,10 @@
-//! Basic logging system using simplelog and log
-//! 
-//! [more detailed explanation]
-//! 
-//! [code example(s)]
-//! 
-//! [other stuff]
-
 /// initialize a simplelog terminal logger and optionally a file logger if ./log/ exists
 pub fn init_logger() -> Result<(), std::io::Error> {
     // import stuff 
     use simplelog::*;
     use std::fs::File;
     use std::time::{SystemTime, UNIX_EPOCH};
+    use log::{info, error};
 
     // determine logger level
     #[cfg(debug_assertions)]
@@ -29,14 +22,14 @@ pub fn init_logger() -> Result<(), std::io::Error> {
             ]
         ).unwrap();
 
-        println!("Initialized terminal and file logger.");
+        info!("Initialized terminal and file logger.");
     }
 
     /// initialize simplelog terminal logger
     fn init_term_logger(level: LevelFilter) {
         TermLogger::init(level, Config::default(), TerminalMode::Mixed).unwrap();
 
-        println!("Unable to create log file. Only initialized terminal logger.");
+        error!("Unable to create log file. Only initialized terminal logger.");
     }
 
     // get timestamp

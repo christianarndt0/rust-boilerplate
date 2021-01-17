@@ -15,12 +15,14 @@ pub struct Config {
 
 impl Config {
     pub fn default() -> Self {
-        Config::from_file(String::from("src/config/default.ron"))
+        let mut path = std::env::current_dir().expect("absolute directory of executable");
+        path = path.join("src/config/default.ron");
+        Config::from_file(path)
     }
 
-    pub fn from_file(path: String) -> Self {
+    pub fn from_file(path: PathBuf) -> Self {
         // open config file
-        info!("Trying to load config from {}", &path);
+        info!("Trying to load config from {}", path.as_path().display());
         let f = File::open(path).expect("config file at given path");
 
         // return config object
@@ -28,8 +30,8 @@ impl Config {
     }
 
     pub fn print(&self) {
-        println!("Config.greeting = {}", self.greeting);
-        println!("Config.number = {}", self.number);
+        info!("Config.greeting = {}", self.greeting);
+        info!("Config.number = {}", self.number);
     }
 }
 
