@@ -1,36 +1,11 @@
-/// initialize a simplelog terminal logger and optionally a file logger if ./log/ exists
-pub fn init_logger() -> Result<(), std::io::Error> {
-    // import stuff 
-    use simplelog::*;
+use simplelog::*;
+use log::{info, warn};
+
+
+fn init_combined_logger(level: LevelFilter) -> Result<(), std::io::Error> {
     use std::fs::File;
     use std::time::{SystemTime, UNIX_EPOCH};
-    use log::{info, error};
-
-    // determine logger level
-    #[cfg(debug_assertions)]
-    let level = LevelFilter::Debug;
-
-    #[cfg(not(debug_assertions))]
-    let level = LevelFilter::Info;
-
-    /// initialize simplelog terminal and file logger
-    fn init_combined_logger(level: LevelFilter, file: File) {
-        CombinedLogger::init(
-            vec![
-                TermLogger::new(level, Config::default(), TerminalMode::Mixed),
-                WriteLogger::new(level, Config::default(), file),
-            ]
-        ).unwrap();
-
-        info!("Initialized terminal and file logger.");
-    }
-
-    /// initialize simplelog terminal logger
-    fn init_term_logger(level: LevelFilter) {
-        TermLogger::init(level, Config::default(), TerminalMode::Mixed).unwrap();
-
-        error!("Unable to create log file. Only initialized terminal logger.");
-    }
+    use std::path::PathBuf;
 
     // get timestamp
     let stamp: String = match SystemTime::now().duration_since(UNIX_EPOCH){
@@ -43,17 +18,47 @@ pub fn init_logger() -> Result<(), std::io::Error> {
     log_name.push_str(&stamp);
     log_name.push_str(".txt");
 
-    // generate absolute path
-    let mut log_dir = std::env::current_dir()?;
-    log_dir = log_dir.join("log").join(log_name);
+    // get absolute path of ./log/logTIMESTAMP.txt
+    let v = vec![String::from("log"), log_name];
+    let log_dir = super::path_from_cwd(v)?;
+    let log_dir_string = log_dir.to_string_lossy().to_string();
 
-    println!("Trying to create log file at: {}", log_dir.display());
+    // create file
+    let file = File::create(log_dir)?;
 
-    // try to create new log file in `./log/`, otherwise only use terminal logger
-    match File::create(log_dir){
-        Ok(f) => init_combined_logger(level, f),
-        Err(_) => init_term_logger(level),
-    };
+    // init simplelog logger
+    CombinedLogger::init(
+        vec![
+            TermLogger::new(level, Config::default(), TerminalMode::Mixed),
+            WriteLogger::new(level, Config::default(), file),
+        ]
+    ).expect("simplelog combined logger");
+
+    info!("Initialized terminal and file logger at {}", log_dir_string);
 
     Ok(())
+}
+
+
+fn init_terminal_logger(level: LevelFilter) {
+    TermLogger::init(level, Config::default(), TerminalMode::Mixed).expect("simplelog terminal logger");
+
+    warn!("Unable to initialize file logger, only initializing terminal logger");
+}
+
+
+/// initialize a simplelog terminal logger and optionally a file logger if ./log/ exists
+pub fn init_logger() {
+    // determine logger level
+    #[cfg(debug_assertions)]
+    let level = LevelFilter::Debug;
+
+    #[cfg(not(debug_assertions))]
+    let level = LevelFilter::Info;
+
+    // try to initialize combined logger, otherwise only initialize terminal logger
+    match init_combined_logger(level) {
+        Ok(_) => (),
+        Err(_) => init_terminal_logger(level),
+    }
 }

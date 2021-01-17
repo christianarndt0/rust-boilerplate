@@ -1,0 +1,2 @@
+04:13:54 [INFO] info message
+04:13:54 [WARN] warn message

@@ -22,7 +22,7 @@ impl Config {
 
     pub fn from_file(path: PathBuf) -> Self {
         // open config file
-        info!("Trying to load config from {}", path.as_path().display());
+        info!("Trying to load config from {}", path.display());
         let f = File::open(path).expect("config file at given path");
 
         // return config object

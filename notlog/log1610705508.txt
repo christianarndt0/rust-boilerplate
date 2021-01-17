@@ -1,0 +1,4 @@
+10:11:48 [DEBUG] (1) example1: debug message
+10:11:48 [INFO] info message
+10:11:48 [WARN] warn message
+10:11:48 [ERROR] error message
