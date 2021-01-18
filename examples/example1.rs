@@ -10,7 +10,7 @@ fn main() -> std::result::Result<(), std::io::Error> {
     let conf = Config::default();
     conf.print();
 
-    init_logger()?;
+    init_logger();
 
     debug!("debug message");
     info!("info message");

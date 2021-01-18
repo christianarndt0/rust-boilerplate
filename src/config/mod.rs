@@ -5,6 +5,8 @@ use std::{
 };
 use log::{info, error};
 
+use crate::utils::path_from_cwd;
+
 
 #[derive(Serialize, Deserialize)]
 pub struct Config {
@@ -15,14 +17,14 @@ pub struct Config {
 
 impl Config {
     pub fn default() -> Self {
-        let mut path = std::env::current_dir().expect("absolute directory of executable");
-        path = path.join("src/config/default.ron");
+        let v = vec![String::from("src"), String::from("config"), String::from("default.ron")];
+        let path = path_from_cwd(v).expect("RON file");
         Config::from_file(path)
     }
 
     pub fn from_file(path: PathBuf) -> Self {
         // open config file
-        info!("Trying to load config from {}", path.display());
+        info!("Loading config from {}", path.display());
         let f = File::open(path).expect("config file at given path");
 
         // return config object

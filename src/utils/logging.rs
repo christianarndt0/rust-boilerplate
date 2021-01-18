@@ -1,5 +1,5 @@
 use simplelog::*;
-use log::{info, warn};
+use log::{info, error};
 
 
 fn init_combined_logger(level: LevelFilter) -> Result<(), std::io::Error> {
@@ -34,7 +34,8 @@ fn init_combined_logger(level: LevelFilter) -> Result<(), std::io::Error> {
         ]
     ).expect("simplelog combined logger");
 
-    info!("Initialized terminal and file logger at {}", log_dir_string);
+    info!("Initialized terminal logger");
+    info!("Initialized file logger at {}", log_dir_string);
 
     Ok(())
 }
@@ -43,7 +44,9 @@ fn init_combined_logger(level: LevelFilter) -> Result<(), std::io::Error> {
 fn init_terminal_logger(level: LevelFilter) {
     TermLogger::init(level, Config::default(), TerminalMode::Mixed).expect("simplelog terminal logger");
 
-    warn!("Unable to initialize file logger, only initializing terminal logger");
+    info!("Initialized terminal logger");
+    #[cfg(debug_assertions)]
+    error!("Unable to initialize file logger, check if ./log/ exists");
 }
 
 
