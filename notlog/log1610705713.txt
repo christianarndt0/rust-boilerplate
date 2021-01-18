@@ -1,3 +1,0 @@
-10:15:13 [INFO] info message
-10:15:13 [WARN] warn message
-10:15:13 [ERROR] error message

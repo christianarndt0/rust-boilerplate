@@ -1,4 +1,0 @@
-18:13:28 [INFO] Initialized terminal and file logger.
-18:13:28 [INFO] Trying to load config from /home/chris/Software/Rust/rust-boilerplate/src/config/default.ron
-18:13:28 [INFO] Config.greeting = Hello, world!
-18:13:28 [INFO] Config.number = 7

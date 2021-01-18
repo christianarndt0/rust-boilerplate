@@ -3,8 +3,6 @@ use rust_boilerplate::{
     utils::logging::init_logger,
 };
 
-use log::info;
-
 
 fn main() -> Result<(), std::io::Error> {
     init_logger();

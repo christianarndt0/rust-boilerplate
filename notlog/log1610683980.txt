@@ -1,3 +1,0 @@
-04:13:00 [DEBUG] (1) rust_boilerplate: debug message
-04:13:00 [INFO] info message
-04:13:00 [WARN] warn message
