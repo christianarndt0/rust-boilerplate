@@ -6,13 +6,18 @@
 pub mod logging;
 
 
-/// Determine the current working directory and append folder by folder (by file) as per the given input vector.
-pub fn path_from_cwd(dirs: Vec<String>) -> Result<std::path::PathBuf, std::io::Error> {
-    let mut path = std::env::current_dir()?;
+/// Wait for console input that is either `y` (+ Return) or `n` (+ Return)
+pub fn ask_yesno() -> bool {
+    // init empty string for console input
+    let mut line = String::new();
 
-    for d in &dirs {
-        path = path.join(d);
+    // read line from console
+    std::io::stdin().read_line(&mut line).unwrap();
+
+    // return result or ask again if input is neither y nor n
+    match &line[..2] {
+        "y\n" => true,
+        "n\n" => false,
+        _     => ask_yesno(),
     }
-
-    Ok(path)
 }

@@ -2,7 +2,15 @@
 
 ## Cargo does (almost) everything
 
-### build, install and run
+Cargo makes building, testing, documenting, running and installing rust applications very easy and standardized.
+
+### Building, Running and Installing
+
+Compile a local package and all of its dependencies with `cargo build`.
+
+```console
+cargo build [--release]
+```
 
 #### --release
 
@@ -12,17 +20,15 @@ Scopes preceded with `#[cfg(debug_assertions)` will only be used when **not** us
 
 Scopes preceded with `#[cfg(not(debug_assertions))]` will only be used when *using* this flag.
 
-```console
-cargo build --release
-```
-
 #### --example
 
-By default, cargo builds and runs `./src/main.rs` but you can use different implementations by passing an executable from `./examples/`.
+By default, cargo builds and runs `./src/lib.rs` and/or `./src/main.rs` but you can use different implementations by passing an executable from `./examples/`.
 
 ```console
-cargo build --example example1
+cargo build --example EXAMPLE.rs [--release]
 ```
+
+will build `./src/lib.rs` and/or `./src/main.rs`.
 
 #### or both
 
@@ -30,31 +36,26 @@ cargo build --example example1
 cargo build --example example1 --release
 ```
 
-### test
+***
 
-`#[cfg(test)]`: The following scope will only be built for tests
+Replace `build` with `run` to also launch the executable.
 
-`#[ŧest]`: Define a test function, e.g.
+Replace `build` with `install` to install the binary system-wide. On Linux, the default location is `$HOME/.cargo/bin/`.
 
-```rust
-#[test]
-fn do_something() {
-    assert_eq!(4, 4);
-}
-```
+### Testing and Documenting
 
-Run all tests with:
+Execute all unit and integration tests and build examples of a local package
 
 ```console
 cargo test
 ```
 
-### doc
+Cargo uses rustdoc (TODO insert link) to build documentation for your crate. Create documentation with
 
 ```console
 cargo doc
 ```
 
-## mdBook
+## User Guides with mdBook
 
 TODO: Building user guides with mdBook...

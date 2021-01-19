@@ -1,34 +1,50 @@
 //! Convenience methods to initialize logging
 //! 
 //! Uses rusts logging facade (log crate) for logging macros and the simplelog crate to handle terminal and file logging.
-//! 
-//! If a ./log/ directory exists, a new timestamped log file will be created on each run.  
-//! If the directory doesn't exist, log statements will only be printed in the console.
 
 
 use simplelog::*;
 use log::{info, error};
+use std::str::FromStr;
 
 
-/// Initialize a simplelog terminal logger and optionally a file logger if ./log/ exists.  
-/// Logger level: debug for non-release builds and info for release builds.
-pub fn init_logger() {
-    // determine logger level
-    #[cfg(debug_assertions)]
-    let level = LevelFilter::Debug;
+#[derive(serde::Serialize, serde::Deserialize)]
+pub struct LoggerConfig {
+    pub output_dir: String,
+    pub level: String,
+}
 
-    #[cfg(not(debug_assertions))]
-    let level = LevelFilter::Info;
 
-    // try to initialize combined logger, otherwise only initialize terminal logger
-    match init_combined_logger(level) {
-        Ok(_) => (),
-        Err(_) => init_terminal_logger(level),
+impl std::fmt::Display for LoggerConfig {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "(output_dir: {}, level: {})", self.output_dir, self.level)
     }
 }
 
 
-fn init_combined_logger(level: LevelFilter) -> Result<(), std::io::Error> {
+/// Initialize a simplelog terminal logger and optionally a file logger if the configured directory exists.  
+pub fn init_logger(cfg: &LoggerConfig) {
+    // determine logger level
+    let level = LevelFilter::from_str(&cfg.level).expect("init LevelFilter from string");
+
+    // check if log directory exists
+    let log_dir = std::path::Path::new(&cfg.output_dir);
+
+    if log_dir.is_dir() {
+        // try to initialize combined logger, otherwise only initialize terminal logger
+        match init_combined_logger(&log_dir, level) {
+            Ok(_) => (),
+            Err(_) => init_terminal_logger(cfg, level),
+        }   
+    }
+    else {
+        error!("output dir {} is not a directory", cfg.output_dir);
+        init_terminal_logger(cfg, level);
+    }
+}
+
+
+fn init_combined_logger(log_dir: &std::path::Path, level: LevelFilter) -> Result<(), std::io::Error> {
     use std::fs::File;
     use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -39,17 +55,13 @@ fn init_combined_logger(level: LevelFilter) -> Result<(), std::io::Error> {
     };
 
     // generate file name
-    let mut log_name = String::from("log");
-    log_name.push_str(&stamp);
-    log_name.push_str(".txt");
+    let log_name = format!("log{}.txt", &stamp);
 
-    // get absolute path of ./log/logTIMESTAMP.txt
-    let v = vec![String::from("log"), log_name];
-    let log_dir = super::path_from_cwd(v)?;
-    let log_dir_string = log_dir.to_string_lossy().to_string();
+    // cat log directory and file name
+    let pb = std::path::PathBuf::from(log_dir).join(log_name);
 
     // create file
-    let file = File::create(log_dir)?;
+    let file = File::create(&pb)?;
 
     // init simplelog logger
     CombinedLogger::init(
@@ -60,18 +72,38 @@ fn init_combined_logger(level: LevelFilter) -> Result<(), std::io::Error> {
     ).expect("simplelog combined logger");
 
     info!("Initialized terminal logger");
-    info!("Initialized file logger at {}", log_dir_string);
+    info!("Initialized file logger at {}", pb.display());
 
     Ok(())
 }
 
 
-fn init_terminal_logger(level: LevelFilter) {
+fn init_terminal_logger(_cfg: &LoggerConfig, level: LevelFilter) {
     TermLogger::init(level, Config::default(), TerminalMode::Mixed).expect("simplelog terminal logger");
 
     info!("Initialized terminal logger");
 
     // only warn about missing log directory in debug builds
     #[cfg(debug_assertions)]
-    error!("Unable to initialize file logger, check if ./log/ exists");
+    log::error!("Unable to initialize file logger, check if {} exists and is a directory", _cfg.output_dir);
+}
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_logger() {
+        let cfg = LoggerConfig {
+            output_dir: String::from("this/does/not/exist/and/would/be/a/file.txt"),
+            level: String::from("Debug"),
+        };
+
+        // should (gracefully) fail to init a file logger but still initialize a terminal logger
+        init_logger(&cfg);
+
+        // not panicking is good enough
+        assert!(true);
+    }
 }

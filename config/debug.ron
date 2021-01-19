@@ -1,0 +1,6 @@
+(
+    logger_cfg: (
+        output_dir: "log",
+        level: "Debug",
+    )
+)
