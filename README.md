@@ -22,18 +22,18 @@ Scopes preceded with `#[cfg(not(debug_assertions))]` will only be used when *usi
 
 #### --example
 
-By default, cargo builds and runs `./src/lib.rs` and/or `./src/main.rs` but you can use different implementations by passing an executable from `./examples/`.
+By default, cargo builds `./src/lib.rs` and/or `./src/main.rs` but you can use different implementations by passing an executable from `./examples/`.
 
 ```console
-cargo build --example EXAMPLE.rs [--release]
+cargo build --example EXAMPLE [--release]
 ```
 
-will build `./src/lib.rs` and/or `./src/main.rs`.
+will build `./src/lib.rs` (if it exists) and `./examples/EXAMPLE.rs`.
 
 #### or both
 
 ```console
-cargo build --example example1 --release
+cargo build --example EXAMPLE --release
 ```
 
 ***
@@ -44,13 +44,13 @@ Replace `build` with `install` to install the binary system-wide. On Linux, the 
 
 ### Testing and Documenting
 
-Execute all unit and integration tests and build examples of a local package
+Execute all unit and integration tests and build examples of a local package with
 
 ```console
 cargo test
 ```
 
-Cargo uses rustdoc (TODO insert link) to build documentation for your crate. Create documentation with
+Cargo uses [rustdoc](https://doc.rust-lang.org/rustdoc/what-is-rustdoc.html) to build documentation for your crate. Create documentation with
 
 ```console
 cargo doc
