@@ -1,5 +1,5 @@
 [package]
-name = "rust-boilerplate"
+name = "{{project-name}}"
 version = "0.1.0"
 authors = ["Chris <chris@christianarndt.net>"]
 edition = "2018"
