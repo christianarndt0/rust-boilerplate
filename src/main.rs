@@ -5,6 +5,5 @@ use {{crate_name}}::{
 
 
 fn main() -> Result<(), std::io::Error> {
-    Err("TODO: implement main entrypoint for {{crate_name}}")
-    // Ok(())
+    std::io::Error::new(std::io::UnexpectedEof, "TODO: implement main.rs for {{}}")
 }
