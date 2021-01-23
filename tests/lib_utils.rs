@@ -1,4 +1,4 @@
-use rust_boilerplate::{
+use {{crate_name}}::{
     Config,
     utils::ask_yesno,
     utils::logging::init_logger,
