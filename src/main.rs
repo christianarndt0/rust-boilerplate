@@ -5,5 +5,5 @@ use {{crate_name}}::{
 
 
 fn main() -> Result<(), std::io::Error> {
-    std::io::Error::new(std::io::UnexpectedEof, "TODO: implement main.rs for {{}}")
+    std::io::Error::new(std::io::UnexpectedEof, "TODO: implement main.rs for {{crate_name}}")
 }
