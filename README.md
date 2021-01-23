@@ -1,21 +1,22 @@
 # {{project-name}}
 
-DESCRIPTION
+Rust template that implements a simple logging framework and loading configs from file to build on top of.
 
-## Installation
+## Creating a new project from the template
 
-### Local
-
-```console
-cargo build [--example EXAMPLE] [--release] 
-```
-
-### Global
+This uses [cargo-generate](https://github.com/cargo-generate/cargo-generate) to automatically replace crate placeholders with your project's info.
+After installing, use
 
 ```console
-cargo install [--example EXAMPLE] [--release] 
+cargo generate --git https://github.com/christianarndt0/rust-boilerplate
 ```
 
-## Usage
+to create a new project from this template.
 
-TODO
+## Examples
+
+Load the appropriate default config from `./config/`, create a terminal and file logger, and print the loaded config.
+
+```console
+cargo run --example log_config [--release] 
+```

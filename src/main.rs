@@ -7,5 +7,5 @@ use std::io::{Error, ErrorKind};
 
 
 fn main() -> Result<(), Error> {
-    Error::new(ErrorKind::UnexpectedEof, "TODO: implement main.rs for {{crate_name}}")
+    Err(Error::new(ErrorKind::UnexpectedEof, "TODO: implement main.rs for {{crate_name}}"))
 }
